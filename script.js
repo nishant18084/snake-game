@@ -2,18 +2,25 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 const box = 20;
-let snake = [{ x: 9 * box, y: 10 * box }];
-let food = {
-    x: Math.floor(Math.random() * 19 + 1) * box,
-    y: Math.floor(Math.random() * 19 + 1) * box
-};
-let score = 0;
-let d;
-let game;
+let snake, food, score, d, game;
+let gameStarted = false;
+
+// Game ko bilkul naya karne ke liye reset function
+function resetGame() {
+    snake = [{ x: 9 * box, y: 10 * box }];
+    food = {
+        x: Math.floor(Math.random() * 19 + 1) * box,
+        y: Math.floor(Math.random() * 19 + 1) * box
+    };
+    score = 0;
+    d = undefined; // Direction clear
+    clearInterval(game); // Purana chal raha loop poori tarah band
+}
 
 document.addEventListener("keydown", direction);
 
 function direction(event) {
+    if (!gameStarted) return;
     if (event.keyCode == 37 && d != "RIGHT") d = "LEFT";
     else if (event.keyCode == 38 && d != "DOWN") d = "UP";
     else if (event.keyCode == 39 && d != "LEFT") d = "RIGHT";
@@ -21,6 +28,7 @@ function direction(event) {
 }
 
 function changeDirection(dir) {
+    if (!gameStarted) return;
     if (dir == "LEFT" && d != "RIGHT") d = "LEFT";
     else if (dir == "UP" && d != "DOWN") d = "UP";
     else if (dir == "RIGHT" && d != "LEFT") d = "RIGHT";
@@ -73,6 +81,7 @@ function draw() {
         collision(newHead, snake)
     ) {
         clearInterval(game);
+        gameStarted = false;
         alert("Game Over! Aapka Score: " + score);
         location.reload();
     }
@@ -80,11 +89,21 @@ function draw() {
     snake.unshift(newHead);
 }
 
-// Ye function mode select karne par chalega
-function startGame(speed) {
-    clearInterval(game); // Purana game stop karne ke liye
+// Jab player kisi mode button par click karega
+function startGame(speed, element) {
+    // 1. Pehle chal rahe game ko clear aur variables ko reset karein
+    resetGame();
+    
+    gameStarted = true;
+    
+    // 2. Buttons ka active status badlein
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active-mode'));
+    element.classList.add('active-mode');
+
+    // 3. Naya game loop sirf select kiye gaye mode ki speed par chalayein
     game = setInterval(draw, speed);
 }
 
-// Default startup (Normal mode se shuru hoga jab tak button na dabe)
-startGame(100);
+// Pehli baar screen par khali/ruka hua game dikhane ke liye
+resetGame();
+draw();
