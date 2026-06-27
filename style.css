@@ -1,7 +1,7 @@
 body {
-    background-color: #222;
-    color: white;
-    font-family: Arial, sans-serif;
+    background: radial-gradient(circle, #1a1a2e 0%, #0f0f1a 100%);
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,96 +16,117 @@ body {
     max-width: 100%;
 }
 
-/* Screens ko hide karne ke liye */
-.hidden {
-    display: none !important;
+h1 {
+    font-size: 36px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #00f2fe;
+    text-shadow: 0 0 10px #00f2fe, 0 0 20px #4facfe;
+    margin-bottom: 20px;
 }
 
-.menu-screen {
-    margin: 40px 0;
+/* Score Board Design */
+.score-board {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(0, 242, 254, 0.2);
+    font-size: 18px;
+    font-weight: bold;
 }
 
-/* Bada Start Game Button */
+#currentScore { color: #00f2fe; }
+#highScore { color: #ff007f; }
+
+.hidden { display: none !important; }
+.menu-screen { margin: 40px 0; }
+
+/* Modern Start Button */
 .main-start-btn {
     padding: 15px 40px;
     font-size: 22px;
     font-weight: bold;
-    background-color: #00bcd4;
+    background: linear-gradient(45deg, #00f2fe, #4facfe);
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 30px;
     cursor: pointer;
-    box-shadow: 0 6px #008ba3, 0 0 15px rgba(0, 188, 212, 0.4);
-    transition: all 0.1s;
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
+    transition: all 0.2s ease;
 }
 
-.main-start-btn:active {
-    box-shadow: 0 2px #008ba3;
-    transform: translateY(4px);
+.main-start-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(0, 242, 254, 0.9);
 }
 
-/* Mode Buttons Styling */
+/* Difficulty Buttons */
 .mode-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 15px;
     align-items: center;
 }
 
 .mode-btn {
-    width: 150px;
-    padding: 12px;
+    width: 180px;
+    padding: 14px;
     font-size: 16px;
     font-weight: bold;
-    border: none;
-    border-radius: 5px;
+    border: 2px solid transparent;
+    border-radius: 25px;
     cursor: pointer;
     color: white;
-    background-color: #444;
-    box-shadow: 0 4px #222;
+    transition: all 0.2s;
 }
 
-.mode-btn:active {
-    transform: scale(0.95);
-}
+.easy-btn { background: #00ff87; color: #000; }
+.normal-btn { background: #ffdf00; color: #000; }
+.hard-btn { background: #ff0055; }
 
+.mode-btn:hover { transform: scale(1.05); filter: brightness(1.2); }
+
+/* Glowing Canvas Frame */
 canvas {
-    background-color: #111;
-    border: 4px solid #4CAF50;
-    box-shadow: 0px 0px 20px rgba(76, 175, 80, 0.5);
+    background-color: #05050a;
+    border: 4px solid #00f2fe;
+    border-radius: 10px;
+    box-shadow: 0px 0px 25px rgba(0, 242, 254, 0.4);
     max-width: 100%;
     height: auto;
 }
 
-/* Mobile Controls */
+/* Sleek Mobile Controls */
 .controls {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 15px;
+    margin-top: 20px;
 }
 
 .row {
     display: flex;
-    gap: 20px;
-    margin: 5px 0;
+    gap: 25px;
+    margin: 8px 0;
 }
 
 .arrow-btn {
-    width: 80px;
+    width: 75px;
     height: 55px;
-    font-size: 16px;
-    font-weight: bold;
-    background-color: #4CAF50;
+    font-size: 18px;
+    background: rgba(255, 255, 255, 0.1);
     color: white;
-    border: none;
-    border-radius: 8px;
+    border: 1px solid rgba(0, 242, 254, 0.4);
+    border-radius: 12px;
     touch-action: manipulation;
-    box-shadow: 0 4px #2e6631;
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
 }
 
 .arrow-btn:active {
-    background-color: #3e8e41;
-    box-shadow: 0 2px #2e6631;
-    transform: translateY(2px);
+    background: #00f2fe;
+    color: #000;
+    box-shadow: 0 0 15px #00f2fe;
 }
