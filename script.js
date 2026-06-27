@@ -5,12 +5,106 @@ const box = 20;
 let snake, food, score, d, game;
 let gameStarted = false;
 
+// Storage configuration
 let savedHighScore = localStorage.getItem("snakeHighScore") || 0;
+let coins = parseInt(localStorage.getItem("snakeCoins")) || 0;
+let unlockedSkins = JSON.parse(localStorage.getItem("unlockedSkins")) || ["cyan"];
+let currentSkin = localStorage.getItem("currentSkin") || "cyan";
+
 document.getElementById("highScore").innerText = savedHighScore;
+document.getElementById("coinCount").innerText = coins;
+
+// 16 Different Skins Data Matrix (Price and Rarity based)
+const skinsCollection = {
+    // COMMON (Basic color sets)
+    cyan: { name: "Cyan Neon", cost: 0, rarity: "common", head: "#00f2fe", body: "#0072ff" },
+    green: { name: "Toxic Green", cost: 15, rarity: "common", head: "#00ff87", body: "#00a352" },
+    red: { name: "Ruby Red", cost: 20, rarity: "common", head: "#ff0055", body: "#990033" },
+    orange: { name: "Tiger Orange", cost: 25, rarity: "common", head: "#ff9900", body: "#b36600" },
+    blue: { name: "Ocean Blue", cost: 30, rarity: "common", head: "#00aeff", body: "#0044cc" },
+
+    // RARE (Premium Shades & Contrasts)
+    purple: { name: "Cosmic Purple", cost: 60, rarity: "rare", head: "#e040fb", body: "#7b1fa2" },
+    pink: { name: "Barbie Pink", cost: 80, rarity: "rare", head: "#ff007f", body: "#ff66b2" },
+    mint: { name: "Fresh Mint", cost: 100, rarity: "rare", head: "#10e7dc", body: "#009688" },
+    shadow: { name: "Shadow Stealth", cost: 120, rarity: "rare", head: "#555555", body: "#222222" },
+
+    // EPIC (High Price Match Ups)
+    magma: { name: "Volcanic Magma", cost: 200, rarity: "epic", head: "#ff3300", body: "#ffaa00" },
+    cyber: { name: "Cyber Matrix", cost: 250, rarity: "epic", head: "#39ff14", body: "#003300" },
+    frozen: { name: "Absolute Zero", cost: 300, rarity: "epic", head: "#a6ffea", body: "#005f73" },
+    bubblegum: { name: "Bubblegum", cost: 350, rarity: "epic", head: "#ff758c", body: "#ff7eb3" },
+
+    // LEGENDARY (Ultra High Pricing & Custom Glows)
+    gold: { name: "👑 Pure Gold", cost: 600, rarity: "legendary", head: "#ffdf00", body: "#d4af37" },
+    diamond: { name: "💎 Diamond Ice", cost: 850, rarity: "legendary", head: "#ffffff", body: "#bde0fe" },
+    rainbow: { name: "🌈 RGB Rainbow", cost: 1200, rarity: "legendary", head: "rainbow_mode", body: "rainbow_mode" }
+};
 
 function showModes() {
     document.getElementById("startMenu").classList.add("hidden");
     document.getElementById("modeMenu").classList.remove("hidden");
+}
+
+function showShop() {
+    document.getElementById("startMenu").classList.add("hidden");
+    document.getElementById("shopMenu").classList.remove("hidden");
+    buildShopMenu();
+}
+
+function hideShop() {
+    document.getElementById("shopMenu").classList.add("hidden");
+    document.getElementById("startMenu").classList.remove("hidden");
+}
+
+// 15+ Skins List ko display generate karne ka function
+function buildShopMenu() {
+    const container = document.getElementById("shopItemsContainer");
+    container.innerHTML = ""; // reset
+
+    Object.keys(skinsCollection).forEach(id => {
+        const item = skinsCollection[id];
+        const isUnlocked = unlockedSkins.includes(id);
+        const isEquipped = currentSkin === id;
+        
+        let buttonText = "Buy";
+        let buttonClass = "buy-btn";
+        if (isEquipped) {
+            buttonText = "Equipped";
+            buttonClass = "buy-btn equipped";
+        } else if (isUnlocked) {
+            buttonText = "Select";
+        }
+
+        const itemHTML = `
+            <div class="shop-item rarity-${item.rarity}">
+                <div>
+                    <span class="skin-name">${item.name}</span>
+                    <span class="skin-price">${isUnlocked ? "Unlocked" : "💰 " + item.cost + " Coins"}</span>
+                </div>
+                <button class="${buttonClass}" onclick="handleShopClick('${id}', ${item.cost})">${buttonText}</button>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', itemHTML);
+    });
+}
+
+function handleShopClick(id, cost) {
+    if (unlockedSkins.includes(id)) {
+        currentSkin = id;
+        localStorage.setItem("currentSkin", currentSkin);
+    } else if (coins >= cost) {
+        coins -= cost;
+        unlockedSkins.push(id);
+        localStorage.setItem("snakeCoins", coins);
+        localStorage.setItem("unlockedSkins", JSON.stringify(unlockedSkins));
+        document.getElementById("coinCount").innerText = coins;
+        currentSkin = id;
+        localStorage.setItem("currentSkin", currentSkin);
+    } else {
+        alert("❌ Coins kam hain! Game khelo aur coins kamao.");
+    }
+    buildShopMenu();
 }
 
 function resetGame() {
@@ -53,30 +147,67 @@ function collision(head, array) {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Grid System
-    ctx.strokeStyle = "rgba(0, 242, 254, 0.03)";
-    for(let i=0; i<canvas.width; i+=box) {
-        ctx.strokeRect(i, 0, box, canvas.height);
-        ctx.strokeRect(0, i, canvas.width, box);
+    // Dynamic Skin Calculation
+    let skin = skinsCollection[currentSkin] || skinsCollection["cyan"];
+    let headColor = skin.head;
+    let bodyColor = skin.body;
+
+    // Rainbow Specially setup logic
+    if (currentSkin === "rainbow") {
+        let hue = (Date.now() / 10) % 360;
+        headColor = `hsl(${hue}, 100%, 50%)`;
+        bodyColor = `hsl(${(hue + 30) % 360}, 100%, 45%)`;
     }
 
-    // Updated Snake Design (Rounded corners for a modern style)
+    // Snake Body & Muh (Eyes) Drawing Logic
     for (let i = 0; i < snake.length; i++) {
-        ctx.fillStyle = i == 0 ? "#00f2fe" : "#0072ff";
-        ctx.shadowBlur = i == 0 ? 8 : 0;
-        ctx.shadowColor = "#00f2fe";
+        ctx.fillStyle = i == 0 ? headColor : bodyColor;
+        ctx.shadowBlur = i == 0 ? 10 : 0;
+        ctx.shadowColor = headColor;
         
-        // Circular / Rounded effect for snake bodies
         ctx.beginPath();
         ctx.arc(snake[i].x + box/2, snake[i].y + box/2, box/2 - 1, 0, 2 * Math.PI);
         ctx.fill();
-    }
-    ctx.shadowBlur = 0;
+        ctx.shadowBlur = 0;
 
-    // Food as a Fruit (🍎 Apple Emoji)
+        // Agar i == 0 hai yani snake ka MUH (Head), toh aankhein draw karein:
+        if (i === 0) {
+            ctx.fillStyle = "#ffffff"; // Eyes base white
+            let eyeSize = 3.5;
+            let eyeOffset = 5;
+
+            let eye1 = { x: 0, y: 0 };
+            let eye2 = { x: 0, y: 0 };
+
+            // Direction ke hisab se aankhon ka rukh badlega
+            if (d === "UP" || d === undefined) {
+                eye1 = { x: snake[i].x + eyeOffset, y: snake[i].y + eyeOffset };
+                eye2 = { x: snake[i].x + box - eyeOffset, y: snake[i].y + eyeOffset };
+            } else if (d === "DOWN") {
+                eye1 = { x: snake[i].x + eyeOffset, y: snake[i].y + box - eyeOffset };
+                eye2 = { x: snake[i].x + box - eyeOffset, y: snake[i].y + box - eyeOffset };
+            } else if (d === "LEFT") {
+                eye1 = { x: snake[i].x + eyeOffset, y: snake[i].y + eyeOffset };
+                eye2 = { x: snake[i].x + eyeOffset, y: snake[i].y + box - eyeOffset };
+            } else if (d === "RIGHT") {
+                eye1 = { x: snake[i].x + box - eyeOffset, y: snake[i].y + eyeOffset };
+                eye2 = { x: snake[i].x + box - eyeOffset, y: snake[i].y + box - eyeOffset };
+            }
+
+            // Draw Eyes White Outer
+            ctx.beginPath(); ctx.arc(eye1.x, eye1.y, eyeSize, 0, 2*Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.arc(eye2.x, eye2.y, eyeSize, 0, 2*Math.PI); ctx.fill();
+
+            // Draw Black Pupils (Choti eyeball)
+            ctx.fillStyle = "#000000";
+            ctx.beginPath(); ctx.arc(eye1.x, eye1.y, eyeSize/2, 0, 2*Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.arc(eye2.x, eye2.y, eyeSize/2, 0, 2*Math.PI); ctx.fill();
+        }
+    }
+
+    // Fruit (🍎)
     ctx.font = "16px Arial";
     ctx.textBaseline = "top";
-    // thoda center text alignment
     ctx.fillText("🍎", food.x + 2, food.y + 2);
 
     let snakeX = snake[0].x;
@@ -89,8 +220,13 @@ function draw() {
 
     if (snakeX == food.x && snakeY == food.y) {
         score++;
-        document.getElementById("currentScore").innerText = score;
+        coins += 2; // Pro Version me 1 fruit = 2 Coins milenge!
         
+        document.getElementById("currentScore").innerText = score;
+        document.getElementById("coinCount").innerText = coins;
+        
+        localStorage.setItem("snakeCoins", coins);
+
         if(score > savedHighScore) {
             savedHighScore = score;
             localStorage.setItem("snakeHighScore", savedHighScore);
@@ -114,7 +250,7 @@ function draw() {
     ) {
         clearInterval(game);
         gameStarted = false;
-        alert("💥 GAME OVER! Your Score: " + score);
+        alert("💥 GAME OVER! Score: " + score + " | Total Coins Save Ho Gaye!");
         location.reload();
     }
 
@@ -131,4 +267,3 @@ function startGame(speed) {
 
 resetGame();
 draw();
-                          
