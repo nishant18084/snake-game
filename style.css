@@ -16,23 +16,53 @@ body {
     max-width: 100%;
 }
 
+/* Screens ko hide karne ke liye */
+.hidden {
+    display: none !important;
+}
+
+.menu-screen {
+    margin: 40px 0;
+}
+
+/* Bada Start Game Button */
+.main-start-btn {
+    padding: 15px 40px;
+    font-size: 22px;
+    font-weight: bold;
+    background-color: #00bcd4;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 6px #008ba3, 0 0 15px rgba(0, 188, 212, 0.4);
+    transition: all 0.1s;
+}
+
+.main-start-btn:active {
+    box-shadow: 0 2px #008ba3;
+    transform: translateY(4px);
+}
+
 /* Mode Buttons Styling */
 .mode-container {
-    margin-bottom: 15px;
     display: flex;
-    justify-content: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
 }
 
 .mode-btn {
-    padding: 8px 15px;
-    font-size: 14px;
+    width: 150px;
+    padding: 12px;
+    font-size: 16px;
     font-weight: bold;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    background-color: #444;
     color: white;
+    background-color: #444;
+    box-shadow: 0 4px #222;
 }
 
 .mode-btn:active {
@@ -47,7 +77,7 @@ canvas {
     height: auto;
 }
 
-/* Mobile Controls Design */
+/* Mobile Controls */
 .controls {
     display: flex;
     flex-direction: column;
