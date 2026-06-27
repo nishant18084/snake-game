@@ -9,18 +9,25 @@
 <body>
     <div class="game-container">
         <h1>Snake Game</h1>
+        
+        <div class="mode-container">
+            <button class="mode-btn" onclick="startGame(150)">🟢 Easy</button>
+            <button class="mode-btn" onclick="startGame(100)">🟡 Normal</button>
+            <button class="mode-btn" onclick="startGame(50)">🔴 Hard</button>
+        </div>
+
         <canvas id="gameCanvas" width="400" height="400"></canvas>
         
         <div class="controls">
-            <button onclick="changeDirection('UP')">🔼 UP</button>
+            <button class="arrow-btn" onclick="changeDirection('UP')">🔼 UP</button>
             <div class="row">
-                <button onclick="changeDirection('LEFT')">◀️ LEFT</button>
-                <button onclick="changeDirection('RIGHT')">▶️ RIGHT</button>
+                <button class="arrow-btn" onclick="changeDirection('LEFT')">◀️ LEFT</button>
+                <button class="arrow-btn" onclick="changeDirection('RIGHT')">▶️ RIGHT</button>
             </div>
-            <button onclick="changeDirection('DOWN')">🔽 DOWN</button>
+            <button class="arrow-btn" onclick="changeDirection('DOWN')">🔽 DOWN</button>
         </div>
 
-        <p>Mobile par khelne ke liye buttons ka use karein!</p>
+        <p>Pehle mode select karein, phir khelna shuru karein!</p>
     </div>
     <script src="script.js"></script>
 </body>
