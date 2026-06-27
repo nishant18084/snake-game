@@ -5,7 +5,6 @@ const box = 20;
 let snake, food, score, d, game;
 let gameStarted = false;
 
-// LocalStorage se High Score load karna
 let savedHighScore = localStorage.getItem("snakeHighScore") || 0;
 document.getElementById("highScore").innerText = savedHighScore;
 
@@ -54,28 +53,31 @@ function collision(head, array) {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Neon Grid Background Effect (Halka grid)
-    ctx.strokeStyle = "rgba(0, 242, 254, 0.05)";
+    // Grid System
+    ctx.strokeStyle = "rgba(0, 242, 254, 0.03)";
     for(let i=0; i<canvas.width; i+=box) {
         ctx.strokeRect(i, 0, box, canvas.height);
         ctx.strokeRect(0, i, canvas.width, box);
     }
 
-    // Glowing Neon Snake
+    // Updated Snake Design (Rounded corners for a modern style)
     for (let i = 0; i < snake.length; i++) {
         ctx.fillStyle = i == 0 ? "#00f2fe" : "#0072ff";
-        ctx.shadowBlur = i == 0 ? 10 : 0;
+        ctx.shadowBlur = i == 0 ? 8 : 0;
         ctx.shadowColor = "#00f2fe";
-        ctx.fillRect(snake[i].x, snake[i].y, box - 1, box - 1); // gap for clean look
+        
+        // Circular / Rounded effect for snake bodies
+        ctx.beginPath();
+        ctx.arc(snake[i].x + box/2, snake[i].y + box/2, box/2 - 1, 0, 2 * Math.PI);
+        ctx.fill();
     }
-    ctx.shadowBlur = 0; // reset glow
+    ctx.shadowBlur = 0;
 
-    // Glowing Food (Neon Pink/Red)
-    ctx.fillStyle = "#ff007f";
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = "#ff007f";
-    ctx.fillRect(food.x, food.y, box - 1, box - 1);
-    ctx.shadowBlur = 0; // reset
+    // Food as a Fruit (🍎 Apple Emoji)
+    ctx.font = "16px Arial";
+    ctx.textBaseline = "top";
+    // thoda center text alignment
+    ctx.fillText("🍎", food.x + 2, food.y + 2);
 
     let snakeX = snake[0].x;
     let snakeY = snake[0].y;
@@ -89,7 +91,6 @@ function draw() {
         score++;
         document.getElementById("currentScore").innerText = score;
         
-        // High score live update check
         if(score > savedHighScore) {
             savedHighScore = score;
             localStorage.setItem("snakeHighScore", savedHighScore);
@@ -123,13 +124,11 @@ function draw() {
 function startGame(speed) {
     resetGame();
     gameStarted = true;
-    
     document.getElementById("modeMenu").classList.add("hidden");
     document.getElementById("gameArea").classList.remove("hidden");
-
     game = setInterval(draw, speed);
 }
 
 resetGame();
 draw();
-}
+                          
