@@ -19,6 +19,14 @@ function direction(event) {
     else if (event.keyCode == 40 && d != "UP") d = "DOWN";
 }
 
+// Mobile Button Controller Function
+function changeDirection(dir) {
+    if (dir == "LEFT" && d != "RIGHT") d = "LEFT";
+    else if (dir == "UP" && d != "DOWN") d = "UP";
+    else if (dir == "RIGHT" && d != "LEFT") d = "RIGHT";
+    else if (dir == "DOWN" && d != "UP") d = "DOWN";
+}
+
 function collision(head, array) {
     for (let i = 0; i < array.length; i++) {
         if (head.x == array[i].x && head.y == array[i].y) return true;
@@ -73,4 +81,3 @@ function draw() {
 }
 
 let game = setInterval(draw, 100);
-
