@@ -9,6 +9,7 @@ let food = {
 };
 let score = 0;
 let d;
+let game;
 
 document.addEventListener("keydown", direction);
 
@@ -19,7 +20,6 @@ function direction(event) {
     else if (event.keyCode == 40 && d != "UP") d = "DOWN";
 }
 
-// Mobile Button Controller Function
 function changeDirection(dir) {
     if (dir == "LEFT" && d != "RIGHT") d = "LEFT";
     else if (dir == "UP" && d != "DOWN") d = "UP";
@@ -80,4 +80,11 @@ function draw() {
     snake.unshift(newHead);
 }
 
-let game = setInterval(draw, 100);
+// Ye function mode select karne par chalega
+function startGame(speed) {
+    clearInterval(game); // Purana game stop karne ke liye
+    game = setInterval(draw, speed);
+}
+
+// Default startup (Normal mode se shuru hoga jab tak button na dabe)
+startGame(100);
