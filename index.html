@@ -10,24 +10,31 @@
     <div class="game-container">
         <h1>Snake Game</h1>
         
-        <div class="mode-container">
-            <button class="mode-btn" onclick="startGame(150)">🟢 Easy</button>
-            <button class="mode-btn" onclick="startGame(100)">🟡 Normal</button>
-            <button class="mode-btn" onclick="startGame(50)">🔴 Hard</button>
+        <div id="startMenu" class="menu-screen">
+            <button class="main-start-btn" onclick="showModes()">🎮 Start Game</button>
         </div>
 
-        <canvas id="gameCanvas" width="400" height="400"></canvas>
-        
-        <div class="controls">
-            <button class="arrow-btn" onclick="changeDirection('UP')">🔼 UP</button>
-            <div class="row">
-                <button class="arrow-btn" onclick="changeDirection('LEFT')">◀️ LEFT</button>
-                <button class="arrow-btn" onclick="changeDirection('RIGHT')">▶️ RIGHT</button>
+        <div id="modeMenu" class="menu-screen hidden">
+            <p style="margin-bottom: 10px; font-weight: bold; color: #ffeb3b;">Choose Difficulty:</p>
+            <div class="mode-container">
+                <button class="mode-btn" onclick="startGame(150, this)">🟢 Easy</button>
+                <button class="mode-btn" onclick="startGame(100, this)">🟡 Normal</button>
+                <button class="mode-btn" onclick="startGame(50, this)">🔴 Hard</button>
             </div>
-            <button class="arrow-btn" onclick="changeDirection('DOWN')">🔽 DOWN</button>
         </div>
 
-        <p>Pehle mode select karein, phir khelna shuru karein!</p>
+        <div id="gameArea" class="hidden">
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+            
+            <div class="controls">
+                <button class="arrow-btn" onclick="changeDirection('UP')">🔼 UP</button>
+                <div class="row">
+                    <button class="arrow-btn" onclick="changeDirection('LEFT')">◀️ LEFT</button>
+                    <button class="arrow-btn" onclick="changeDirection('RIGHT')">▶️ RIGHT</button>
+                </div>
+                <button class="arrow-btn" onclick="changeDirection('DOWN')">🔽 DOWN</button>
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
