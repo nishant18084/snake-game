@@ -5,7 +5,12 @@ const box = 20;
 let snake, food, score, d, game;
 let gameStarted = false;
 
-// Game ko bilkul naya karne ke liye reset function
+// "Start Game" par click karne par modes dikhane ke liye
+function showModes() {
+    document.getElementById("startMenu").classList.add("hidden");
+    document.getElementById("modeMenu").classList.remove("hidden");
+}
+
 function resetGame() {
     snake = [{ x: 9 * box, y: 10 * box }];
     food = {
@@ -13,8 +18,8 @@ function resetGame() {
         y: Math.floor(Math.random() * 19 + 1) * box
     };
     score = 0;
-    d = undefined; // Direction clear
-    clearInterval(game); // Purana chal raha loop poori tarah band
+    d = undefined;
+    clearInterval(game);
 }
 
 document.addEventListener("keydown", direction);
@@ -89,21 +94,13 @@ function draw() {
     snake.unshift(newHead);
 }
 
-// Jab player kisi mode button par click karega
 function startGame(speed, element) {
-    // 1. Pehle chal rahe game ko clear aur variables ko reset karein
     resetGame();
-    
     gameStarted = true;
     
-    // 2. Buttons ka active status badlein
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active-mode'));
-    element.classList.add('active-mode');
+    // Mode select hote hi Mode Menu chupayein aur Game Area dikhayein
+    document.getElementById("modeMenu").classList.add("hidden");
+    document.getElementById("gameArea").classList.remove("hidden");
 
-    // 3. Naya game loop sirf select kiye gaye mode ki speed par chalayein
     game = setInterval(draw, speed);
 }
-
-// Pehli baar screen par khali/ruka hua game dikhane ke liye
-resetGame();
-draw();
