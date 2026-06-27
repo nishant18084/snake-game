@@ -3,23 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classic Snake Game</title>
+    <title>Neon Snake Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
-        <h1>Snake Game</h1>
+        <h1>Neon Snake</h1>
+        
+        <div class="score-board">
+            <div>Score: <span id="currentScore">0</span></div>
+            <div>Best: <span id="highScore">0</span></div>
+        </div>
         
         <div id="startMenu" class="menu-screen">
-            <button class="main-start-btn" onclick="showModes()">🎮 Start Game</button>
+            <button class="main-start-btn" onclick="showModes()">🎮 PLAY GAME</button>
         </div>
 
         <div id="modeMenu" class="menu-screen hidden">
-            <p style="margin-bottom: 10px; font-weight: bold; color: #ffeb3b;">Choose Difficulty:</p>
+            <p style="margin-bottom: 15px; font-weight: bold; color: #00f2fe;">SELECT DIFFICULTY</p>
             <div class="mode-container">
-                <button class="mode-btn" onclick="startGame(150, this)">🟢 Easy</button>
-                <button class="mode-btn" onclick="startGame(100, this)">🟡 Normal</button>
-                <button class="mode-btn" onclick="startGame(50, this)">🔴 Hard</button>
+                <button class="mode-btn easy-btn" onclick="startGame(140)">🟢 Easy</button>
+                <button class="mode-btn" onclick="startGame(90)">🟡 Normal</button>
+                <button class="mode-btn hard-btn" onclick="startGame(50)">🔴 Hard</button>
             </div>
         </div>
 
@@ -27,12 +32,12 @@
             <canvas id="gameCanvas" width="400" height="400"></canvas>
             
             <div class="controls">
-                <button class="arrow-btn" onclick="changeDirection('UP')">🔼 UP</button>
+                <button class="arrow-btn" onclick="changeDirection('UP')">▲</button>
                 <div class="row">
-                    <button class="arrow-btn" onclick="changeDirection('LEFT')">◀️ LEFT</button>
-                    <button class="arrow-btn" onclick="changeDirection('RIGHT')">▶️ RIGHT</button>
+                    <button class="arrow-btn" onclick="changeDirection('LEFT')">◀</button>
+                    <button class="arrow-btn" onclick="changeDirection('RIGHT')">▶</button>
                 </div>
-                <button class="arrow-btn" onclick="changeDirection('DOWN')">🔽 DOWN</button>
+                <button class="arrow-btn" onclick="changeDirection('DOWN')">▼</button>
             </div>
         </div>
     </div>
