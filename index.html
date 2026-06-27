@@ -3,29 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Snake Game</title>
+    <title>Ultimate Neon Snake Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
-        <h1>Neon Snake</h1>
+        <h1>Neon Snake Pro</h1>
         
         <div class="score-board">
             <div>Score: <span id="currentScore">0</span></div>
             <div>Best: <span id="highScore">0</span></div>
+            <div>💰 Coins: <span id="coinCount">0</span></div>
         </div>
         
         <div id="startMenu" class="menu-screen">
-            <button class="main-start-btn" onclick="showModes()">🎮 PLAY GAME</button>
+            <button class="main-btn" onclick="showModes()">🎮 PLAY GAME</button>
+            <button class="main-btn shop-btn-main" onclick="showShop()">🛒 SKIN SHOP (15+ Skins)</button>
+        </div>
+
+        <div id="shopMenu" class="menu-screen hidden">
+            <p class="menu-title">✨ ULTIMATE SKIN SHOP ✨</p>
+            <div class="shop-container" id="shopItemsContainer">
+                </div>
+            <button class="back-btn" onclick="hideShop()">🔙 Back to Menu</button>
         </div>
 
         <div id="modeMenu" class="menu-screen hidden">
-            <p style="margin-bottom: 15px; font-weight: bold; color: #00f2fe;">SELECT DIFFICULTY</p>
+            <p class="menu-title">SELECT DIFFICULTY</p>
             <div class="mode-container">
                 <button class="mode-btn easy-btn" onclick="startGame(140)">🟢 Easy</button>
-                <button class="mode-btn" onclick="startGame(90)">🟡 Normal</button>
+                <button class="mode-btn normal-btn" onclick="startGame(90)">🟡 Normal</button>
                 <button class="mode-btn hard-btn" onclick="startGame(50)">🔴 Hard</button>
             </div>
+            <button class="back-btn" onclick="location.reload()">🔙 Back</button>
         </div>
 
         <div id="gameArea" class="hidden">
