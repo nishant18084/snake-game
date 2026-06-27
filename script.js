@@ -5,7 +5,10 @@ const box = 20;
 let snake, food, score, d, game;
 let gameStarted = false;
 
-// "Start Game" par click karne par modes dikhane ke liye
+// LocalStorage se High Score load karna
+let savedHighScore = localStorage.getItem("snakeHighScore") || 0;
+document.getElementById("highScore").innerText = savedHighScore;
+
 function showModes() {
     document.getElementById("startMenu").classList.add("hidden");
     document.getElementById("modeMenu").classList.remove("hidden");
@@ -18,6 +21,7 @@ function resetGame() {
         y: Math.floor(Math.random() * 19 + 1) * box
     };
     score = 0;
+    document.getElementById("currentScore").innerText = score;
     d = undefined;
     clearInterval(game);
 }
@@ -50,15 +54,28 @@ function collision(head, array) {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    for (let i = 0; i < snake.length; i++) {
-        ctx.fillStyle = i == 0 ? "#4CAF50" : "#8BC34A";
-        ctx.fillRect(snake[i].x, snake[i].y, box, box);
-        ctx.strokeStyle = "#111";
-        ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+    // Neon Grid Background Effect (Halka grid)
+    ctx.strokeStyle = "rgba(0, 242, 254, 0.05)";
+    for(let i=0; i<canvas.width; i+=box) {
+        ctx.strokeRect(i, 0, box, canvas.height);
+        ctx.strokeRect(0, i, canvas.width, box);
     }
 
-    ctx.fillStyle = "#FF5722";
-    ctx.fillRect(food.x, food.y, box, box);
+    // Glowing Neon Snake
+    for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = i == 0 ? "#00f2fe" : "#0072ff";
+        ctx.shadowBlur = i == 0 ? 10 : 0;
+        ctx.shadowColor = "#00f2fe";
+        ctx.fillRect(snake[i].x, snake[i].y, box - 1, box - 1); // gap for clean look
+    }
+    ctx.shadowBlur = 0; // reset glow
+
+    // Glowing Food (Neon Pink/Red)
+    ctx.fillStyle = "#ff007f";
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = "#ff007f";
+    ctx.fillRect(food.x, food.y, box - 1, box - 1);
+    ctx.shadowBlur = 0; // reset
 
     let snakeX = snake[0].x;
     let snakeY = snake[0].y;
@@ -70,6 +87,15 @@ function draw() {
 
     if (snakeX == food.x && snakeY == food.y) {
         score++;
+        document.getElementById("currentScore").innerText = score;
+        
+        // High score live update check
+        if(score > savedHighScore) {
+            savedHighScore = score;
+            localStorage.setItem("snakeHighScore", savedHighScore);
+            document.getElementById("highScore").innerText = savedHighScore;
+        }
+
         food = {
             x: Math.floor(Math.random() * 19 + 1) * box,
             y: Math.floor(Math.random() * 19 + 1) * box
@@ -87,20 +113,23 @@ function draw() {
     ) {
         clearInterval(game);
         gameStarted = false;
-        alert("Game Over! Aapka Score: " + score);
+        alert("💥 GAME OVER! Your Score: " + score);
         location.reload();
     }
 
     snake.unshift(newHead);
 }
 
-function startGame(speed, element) {
+function startGame(speed) {
     resetGame();
     gameStarted = true;
     
-    // Mode select hote hi Mode Menu chupayein aur Game Area dikhayein
     document.getElementById("modeMenu").classList.add("hidden");
     document.getElementById("gameArea").classList.remove("hidden");
 
     game = setInterval(draw, speed);
+}
+
+resetGame();
+draw();
 }
