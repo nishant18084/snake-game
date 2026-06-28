@@ -3,28 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Neon Snake Pro</title>
+    <title>Arcade Hub: Snake & Racing</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
-        <h1>3D Neon Snake</h1>
+        <h1 id="mainTitle">Arcade Hub</h1>
         
         <div class="score-board">
-            <div>Score: <span id="currentScore">0</span></div>
-            <div>Best: <span id="highScore">0</span></div>
+            <div id="scoreDiv">Score: <span id="currentScore">0</span></div>
+            <div id="bestDiv">Best: <span id="highScore">0</span></div>
             <div>💰 Coins: <span id="coinCount">0</span></div>
         </div>
         
-        <div id="startMenu" class="menu-screen">
-            <button class="main-btn" onclick="showModes()">🎮 PLAY GAME</button>
+        <div id="hubMenu" class="menu-screen">
+            <p class="menu-title">SELECT GAME MODE</p>
+            <div class="mode-container">
+                <button class="hub-btn snake-hub" onclick="selectGame('snake')">🐍 Snake Neon Pro</button>
+                <button class="hub-btn racing-hub" onclick="selectGame('racing')">🏎️ Turbo Racing</button>
+            </div>
+        </div>
+
+        <div id="startMenu" class="menu-screen hidden">
+            <button class="main-btn" onclick="showModes()">🎮 PLAY SNAKE</button>
             <button class="main-btn shop-btn-main" onclick="showShop()">🛒 SKIN SHOP</button>
+            <button class="back-btn" onclick="backToHub()">🔙 Back to Hub</button>
         </div>
 
         <div id="shopMenu" class="menu-screen hidden">
             <p class="menu-title">✨ ULTIMATE SKIN SHOP ✨</p>
             <div class="shop-container" id="shopItemsContainer"></div>
-            <button class="back-btn" onclick="hideShop()">🔙 Back to Menu</button>
+            <button class="back-btn" onclick="hideShop()">🔙 Back</button>
         </div>
 
         <div id="modeMenu" class="menu-screen hidden">
@@ -34,7 +43,7 @@
                 <button class="mode-btn normal-btn" onclick="startGame(90)">🟡 Normal</button>
                 <button class="mode-btn hard-btn" onclick="startGame(50)">🔴 Hard</button>
             </div>
-            <button class="back-btn" onclick="location.reload()">🔙 Back</button>
+            <button class="back-btn" onclick="showSnakeMenu()">🔙 Back</button>
         </div>
 
         <div id="gameArea" class="hidden">
@@ -48,12 +57,12 @@
             </div>
             
             <div class="controls">
-                <button class="arrow-btn" onclick="changeDirection('UP')">▲</button>
+                <button class="arrow-btn" onclick="handleControl('UP')">▲</button>
                 <div class="row">
-                    <button class="arrow-btn" onclick="changeDirection('LEFT')">◀</button>
-                    <button class="arrow-btn" onclick="changeDirection('RIGHT')">▶</button>
+                    <button class="arrow-btn" onclick="handleControl('LEFT')">◀</button>
+                    <button class="arrow-btn" onclick="handleControl('RIGHT')">▶</button>
                 </div>
-                <button class="arrow-btn" onclick="changeDirection('DOWN')">▼</button>
+                <button class="arrow-btn" onclick="handleControl('DOWN')">▼</button>
             </div>
         </div>
     </div>
