@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Neon Snake Pro</title>
+    <title>3D Neon Snake Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
-        <h1>Neon Snake Pro</h1>
+        <h1>3D Neon Snake</h1>
         
         <div class="score-board">
             <div>Score: <span id="currentScore">0</span></div>
@@ -18,13 +18,12 @@
         
         <div id="startMenu" class="menu-screen">
             <button class="main-btn" onclick="showModes()">🎮 PLAY GAME</button>
-            <button class="main-btn shop-btn-main" onclick="showShop()">🛒 SKIN SHOP (15+ Skins)</button>
+            <button class="main-btn shop-btn-main" onclick="showShop()">🛒 SKIN SHOP</button>
         </div>
 
         <div id="shopMenu" class="menu-screen hidden">
             <p class="menu-title">✨ ULTIMATE SKIN SHOP ✨</p>
-            <div class="shop-container" id="shopItemsContainer">
-                </div>
+            <div class="shop-container" id="shopItemsContainer"></div>
             <button class="back-btn" onclick="hideShop()">🔙 Back to Menu</button>
         </div>
 
@@ -39,7 +38,14 @@
         </div>
 
         <div id="gameArea" class="hidden">
-            <canvas id="gameCanvas" width="400" height="400"></canvas>
+            <div class="pause-container">
+                <button id="pauseBtn" class="pause-btn" onclick="togglePause()">⏸️ Pause</button>
+            </div>
+
+            <div style="position: relative; display: inline-block;">
+                <canvas id="gameCanvas" width="400" height="400"></canvas>
+                <div id="pauseOverlay" class="pause-overlay hidden">GAME PAUSED</div>
+            </div>
             
             <div class="controls">
                 <button class="arrow-btn" onclick="changeDirection('UP')">▲</button>
