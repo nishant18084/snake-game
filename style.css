@@ -13,7 +13,8 @@ body {
 
 .game-container {
     text-align: center;
-    max-width: 100%;
+    width: 100%;
+    max-width: 400px; /* Mobile par perfectly fit hone ke liye */
 }
 
 h1 {
@@ -31,7 +32,7 @@ h1 {
     background: rgba(255, 255, 255, 0.05);
     padding: 12px;
     border-radius: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
     border: 1px solid rgba(0, 242, 254, 0.2);
     font-size: 16px;
     font-weight: bold;
@@ -46,6 +47,8 @@ h1 {
 .menu-title { font-weight: bold; color: #00f2fe; margin-bottom: 25px; font-size: 22px; text-shadow: 0 0 8px rgba(0, 242, 254, 0.6);}
 
 .main-btn {
+    -webkit-appearance: none;
+    appearance: none;
     display: block;
     width: 220px;
     margin: 12px auto;
@@ -58,125 +61,86 @@ h1 {
     border-radius: 30px;
     cursor: pointer;
     box-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
-    transition: all 0.2s;
 }
-.shop-btn-main { background: linear-gradient(45deg, #ff007f, #ff0055); box-shadow: 0 0 15px rgba(255, 0, 127, 0.5); }
-.main-btn:hover { transform: scale(1.05); }
-
-.shop-container {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(0, 242, 254, 0.2);
-    border-radius: 15px;
-    padding: 15px;
-    width: 300px;
-    max-height: 280px;
-    overflow-y: auto;
-    margin: 0 auto 15px auto;
-}
-
-.shop-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
-    border-left: 4px solid #fff;
-}
-
-.rarity-common { border-left-color: #aaa; }
-.rarity-rare { border-left-color: #00f2fe; }
-.rarity-epic { border-left-color: #e040fb; }
-.rarity-legendary { border-left-color: #ffdf00; }
-
-.buy-btn {
-    padding: 6px 14px;
-    font-size: 12px;
-    font-weight: bold;
-    background: #333;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-}
-.buy-btn.equipped { background: #00ff87; color: black; box-shadow: 0 0 8px #00ff87; }
-
-.pause-container { margin-bottom: 10px; text-align: right; }
-.pause-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(0, 242, 254, 0.4); color: white; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-weight: bold; }
 
 /* ======================================================= */
-/* NEW ADVANCED 3D MODES BUTTONS DESIGN */
+/* FIX: FULL-WIDTH VERTICAL 3D CARDS LAYOUT */
 /* ======================================================= */
 .mode-container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 22px; /* Buttons ke beech ka gap */
     align-items: center;
     margin-bottom: 25px;
-    perspective: 1000px; /* 3D Depth alignment */
 }
 
 .mode-btn {
-    width: 200px;
-    padding: 16px;
+    -webkit-appearance: none; /* Default browser style hatane ke liye */
+    appearance: none;
+    outline: none;
+    width: 85%; /* Sahi size me bade aur badhiya dikhenge */
+    max-width: 260px;
+    padding: 15px 20px;
     font-size: 18px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1px;
     border: none;
-    border-radius: 12px;
+    border-radius: 14px;
     cursor: pointer;
-    color: white;
-    position: relative;
-    transition: all 0.15s ease-in-out;
-    transform: rotateX(15deg); /* Isometric tilt */
+    transition: all 0.1s ease-in-out;
+    display: block;
 }
 
-/* Easy 3D Card (Green Theme) */
+/* Easy Button (Premium 3D Green) */
 .easy-btn {
-    background: linear-gradient(135deg, #00ff87, #60efff);
-    color: #050c08;
-    box-shadow: 0px 8px 0px #00a352, 0px 15px 20px rgba(0, 255, 135, 0.3);
-}
-.easy-btn:hover {
-    box-shadow: 0px 10px 0px #00a352, 0px 18px 25px rgba(0, 255, 135, 0.4);
-    transform: rotateX(10deg) translateY(-2px);
+    background: linear-gradient(135deg, #00ff87, #00d2ff);
+    color: #040f09;
+    box-shadow: 0px 8px 0px #00964f, 0px 12px 20px rgba(0, 255, 135, 0.3);
 }
 .easy-btn:active {
-    box-shadow: 0px 2px 0px #00a352, 0px 4px 10px rgba(0, 255, 135, 0.2);
-    transform: rotateX(5deg) translateY(6px);
+    transform: translateY(6px);
+    box-shadow: 0px 2px 0px #00964f, 0px 4px 10px rgba(0, 255, 135, 0.2);
 }
 
-/* Normal 3D Card (Yellow/Orange Theme) */
+/* Normal Button (Premium 3D Yellow/Orange) */
 .normal-btn {
     background: linear-gradient(135deg, #ffdf00, #ff7300);
     color: #120a00;
-    box-shadow: 0px 8px 0px #b35000, 0px 15px 20px rgba(255, 115, 0, 0.3);
-}
-.normal-btn:hover {
-    box-shadow: 0px 10px 0px #b35000, 0px 18px 25px rgba(255, 115, 0, 0.4);
-    transform: rotateX(10deg) translateY(-2px);
+    box-shadow: 0px 8px 0px #b35000, 0px 12px 20px rgba(255, 115, 0, 0.3);
 }
 .normal-btn:active {
+    transform: translateY(6px);
     box-shadow: 0px 2px 0px #b35000, 0px 4px 10px rgba(255, 115, 0, 0.2);
-    transform: rotateX(5deg) translateY(6px);
 }
 
-/* Hard 3D Card (Red/Pink Theme) */
+/* Hard Button (Premium 3D Red) */
 .hard-btn {
-    background: linear-gradient(135deg, #ff0055, #750027);
+    background: linear-gradient(135deg, #ff0055, #990033);
     color: #fff;
-    box-shadow: 0px 8px 0px #400015, 0px 15px 20px rgba(255, 0, 85, 0.3);
-}
-.hard-btn:hover {
-    box-shadow: 0px 10px 0px #400015, 0px 18px 25px rgba(255, 0, 85, 0.4);
-    transform: rotateX(10deg) translateY(-2px);
+    box-shadow: 0px 8px 0px #59001e, 0px 12px 20px rgba(255, 0, 85, 0.3);
 }
 .hard-btn:active {
-    box-shadow: 0px 2px 0px #400015, 0px 4px 10px rgba(255, 0, 85, 0.2);
-    transform: rotateX(5deg) translateY(6px);
+    transform: translateY(6px);
+    box-shadow: 0px 2px 0px #59001e, 0px 4px 10px rgba(255, 0, 85, 0.2);
 }
+
+/* Back Button Styled Clean */
+.back-btn {
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ccc;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+    margin-top: 10px;
+}
+.back-btn:active { background: rgba(255, 255, 255, 0.2); }
 /* ======================================================= */
 
 canvas {
