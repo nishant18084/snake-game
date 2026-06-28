@@ -14,7 +14,7 @@ body {
 .game-container {
     text-align: center;
     width: 100%;
-    max-width: 400px; /* Mobile par perfectly fit hone ke liye */
+    max-width: 400px;
 }
 
 h1 {
@@ -22,7 +22,7 @@ h1 {
     text-transform: uppercase;
     letter-spacing: 3px;
     color: #00f2fe;
-    text-shadow: 0 0 10px #00f2fe, 0 0 20px #4facfe;
+    text-shadow: 0 0 10px #00f2fe;
     margin-bottom: 15px;
 }
 
@@ -44,128 +44,71 @@ h1 {
 
 .hidden { display: none !important; }
 .menu-screen { margin: 20px 0; }
-.menu-title { font-weight: bold; color: #00f2fe; margin-bottom: 25px; font-size: 22px; text-shadow: 0 0 8px rgba(0, 242, 254, 0.6);}
+.menu-title { font-weight: bold; color: #00f2fe; margin-bottom: 25px; font-size: 22px;}
 
+/* Main Buttons Setup */
 .main-btn {
-    -webkit-appearance: none;
-    appearance: none;
-    display: block;
-    width: 220px;
-    margin: 12px auto;
-    padding: 14px;
-    font-size: 16px;
-    font-weight: bold;
+    -webkit-appearance: none; appearance: none;
+    display: block; width: 220px; margin: 12px auto; padding: 14px;
+    font-size: 16px; font-weight: bold;
     background: linear-gradient(45deg, #00f2fe, #4facfe);
-    color: white;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
+    color: white; border: none; border-radius: 30px; cursor: pointer;
     box-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
 }
+.shop-btn-main { background: linear-gradient(45deg, #ff007f, #ff0055); box-shadow: 0 0 15px rgba(255, 0, 127, 0.5); }
 
-/* ======================================================= */
-/* FIX: FULL-WIDTH VERTICAL 3D CARDS LAYOUT */
-/* ======================================================= */
-.mode-container {
-    display: flex;
-    flex-direction: column;
-    gap: 22px; /* Buttons ke beech ka gap */
-    align-items: center;
-    margin-bottom: 25px;
+/* Hub 3D Game Selection Cards */
+.hub-btn {
+    -webkit-appearance: none; appearance: none;
+    width: 85%; max-width: 260px; padding: 18px;
+    font-size: 18px; font-weight: 800; text-transform: uppercase;
+    border: none; border-radius: 14px; cursor: pointer;
+    transition: all 0.1s ease-in-out; display: block;
 }
+.snake-hub {
+    background: linear-gradient(135deg, #00f2fe, #4facfe); color: #fff;
+    box-shadow: 0px 8px 0px #0072ff, 0px 12px 20px rgba(0, 242, 254, 0.3);
+}
+.snake-hub:active { transform: translateY(6px); box-shadow: 0px 2px 0px #0072ff; }
 
+.racing-hub {
+    background: linear-gradient(135deg, #ff0055, #ff7300); color: #fff;
+    box-shadow: 0px 8px 0px #990033, 0px 12px 20px rgba(255, 0, 85, 0.3);
+}
+.racing-hub:active { transform: translateY(6px); box-shadow: 0px 2px 0px #990033; }
+
+/* 3D Difficulty Layout Cards */
+.mode-container { display: flex; flex-direction: column; gap: 22px; align-items: center; margin-bottom: 25px; }
 .mode-btn {
-    -webkit-appearance: none; /* Default browser style hatane ke liye */
-    appearance: none;
-    outline: none;
-    width: 85%; /* Sahi size me bade aur badhiya dikhenge */
-    max-width: 260px;
-    padding: 15px 20px;
-    font-size: 18px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border: none;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.1s ease-in-out;
-    display: block;
+    -webkit-appearance: none; appearance: none;
+    width: 85%; max-width: 260px; padding: 15px;
+    font-size: 18px; font-weight: 800; text-transform: uppercase;
+    border: none; border-radius: 14px; cursor: pointer; transition: all 0.1s;
 }
+.easy-btn { background: linear-gradient(135deg, #00ff87, #00d2ff); color: #040f09; box-shadow: 0px 8px 0px #00964f; }
+.easy-btn:active { transform: translateY(6px); box-shadow: 0px 2px 0px #00964f; }
 
-/* Easy Button (Premium 3D Green) */
-.easy-btn {
-    background: linear-gradient(135deg, #00ff87, #00d2ff);
-    color: #040f09;
-    box-shadow: 0px 8px 0px #00964f, 0px 12px 20px rgba(0, 255, 135, 0.3);
-}
-.easy-btn:active {
-    transform: translateY(6px);
-    box-shadow: 0px 2px 0px #00964f, 0px 4px 10px rgba(0, 255, 135, 0.2);
-}
+.normal-btn { background: linear-gradient(135deg, #ffdf00, #ff7300); color: #120a00; box-shadow: 0px 8px 0px #b35000; }
+.normal-btn:active { transform: translateY(6px); box-shadow: 0px 2px 0px #b35000; }
 
-/* Normal Button (Premium 3D Yellow/Orange) */
-.normal-btn {
-    background: linear-gradient(135deg, #ffdf00, #ff7300);
-    color: #120a00;
-    box-shadow: 0px 8px 0px #b35000, 0px 12px 20px rgba(255, 115, 0, 0.3);
-}
-.normal-btn:active {
-    transform: translateY(6px);
-    box-shadow: 0px 2px 0px #b35000, 0px 4px 10px rgba(255, 115, 0, 0.2);
-}
+.hard-btn { background: linear-gradient(135deg, #ff0055, #990033); color: #fff; box-shadow: 0px 8px 0px #59001e; }
+.hard-btn:active { transform: translateY(6px); box-shadow: 0px 2px 0px #59001e; }
 
-/* Hard Button (Premium 3D Red) */
-.hard-btn {
-    background: linear-gradient(135deg, #ff0055, #990033);
-    color: #fff;
-    box-shadow: 0px 8px 0px #59001e, 0px 12px 20px rgba(255, 0, 85, 0.3);
+.shop-container {
+    background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(0, 242, 254, 0.2);
+    border-radius: 15px; padding: 15px; width: 300px; max-height: 250px; overflow-y: auto; margin: 0 auto 15px auto;
 }
-.hard-btn:active {
-    transform: translateY(6px);
-    box-shadow: 0px 2px 0px #59001e, 0px 4px 10px rgba(255, 0, 85, 0.2);
-}
+.shop-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 8px; background: rgba(255, 255, 255, 0.03); border-radius: 8px; border-left: 4px solid #fff; }
+.rarity-common { border-left-color: #aaa; } .rarity-rare { border-left-color: #00f2fe; } .rarity-epic { border-left-color: #e040fb; } .rarity-legendary { border-left-color: #ffdf00; }
+.buy-btn { padding: 6px 14px; font-size: 12px; font-weight: bold; background: #333; color: white; border: none; border-radius: 20px; }
+.buy-btn.equipped { background: #00ff87; color: black; }
 
-/* Back Button Styled Clean */
-.back-btn {
-    -webkit-appearance: none;
-    appearance: none;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #ccc;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: 0.2s;
-    margin-top: 10px;
-}
-.back-btn:active { background: rgba(255, 255, 255, 0.2); }
-/* ======================================================= */
+.pause-container { margin-bottom: 10px; text-align: right; }
+.pause-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(0, 242, 254, 0.4); color: white; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+.back-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #ccc; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 14px; }
 
-canvas {
-    background-color: #05050a;
-    border: 4px solid #00f2fe;
-    border-radius: 12px;
-    box-shadow: 0px 0px 20px rgba(0, 242, 254, 0.4);
-    max-width: 100%;
-    height: auto;
-}
-
-.pause-overlay {
-    position: absolute;
-    top: 4px; left: 4px; right: 4px; bottom: 8px;
-    background: rgba(0, 0, 0, 0.8);
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 28px;
-    font-weight: bold;
-    color: #ffdf00;
-    text-shadow: 0 0 10px #ffdf00;
-}
-
+canvas { background-color: #05050a; border: 4px solid #00f2fe; border-radius: 12px; box-shadow: 0px 0px 20px rgba(0, 242, 254, 0.4); max-width: 100%; height: auto; }
+.pause-overlay { position: absolute; top: 4px; left: 4px; right: 4px; bottom: 8px; background: rgba(0, 0, 0, 0.8); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 28px; font-weight: bold; color: #ffdf00; text-shadow: 0 0 10px #ffdf00; }
 .controls { display: flex; flex-direction: column; align-items: center; margin-top: 15px; }
 .row { display: flex; gap: 20px; margin: 6px 0; }
 .arrow-btn { width: 75px; height: 52px; font-size: 18px; background: rgba(255, 255, 255, 0.08); color: white; border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 12px; touch-action: manipulation; }
