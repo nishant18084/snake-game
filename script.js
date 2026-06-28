@@ -1,31 +1,27 @@
-
 // ==========================================
-// ENGINE 2: HILL CLIMB RACING MODE
+// ENGINE 2: 3D HORIZON HILL RACING MODE (NO FUEL)
 // ==========================================
-let fuel = 100;
-let carPhysics = { x: 50, y: 200, vy: 0, vx: 2, angle: 0, vAngle: 0 };
-let terrainPoints = [];
+let trackPosition = 0;
+let playerX = 0; // -1 se 1 tak (road ke left/right)
+let carSpeed = 0;
+const maxSpeed = 20;
 
+// 3D Track generation (pahaad aur curves)
+let trackSegments = [];
 function startRacingGame() {
-    score = 0; isPaused = false; fuel = 100;
-    carPhysics = { x: 60, y: 200, vy: 0, vx: 3, angle: 0, vAngle: 0 };
+    score = 0; isPaused = false; trackPosition = 0; playerX = 0; carSpeed = 5;
+    trackSegments = [];
     
-    // Procedural 2D Mountain Terrain Generation
-    terrainPoints = [];
-    let currentY = 300;
-    for (let i = 0; i < 500; i++) {
-        // Har 40px par pahaad upar-niche hoga
-        currentY += Math.sin(i * 0.1) * 25 + (Math.random() * 15 - 7);
-        // Zameen zyada upar na chali jaye
-        if (currentY < 180) currentY = 180;
-        if (currentY > 360) currentY = 360;
+    // 1000 segments lambi 3D road banayein pahaad aur mod ke sath
+    for (let i = 0; i < 1000; i++) {
+        let curve = 0;
+        let hill = 0;
         
-        // Raste me items daalna
-        let item = "none";
-        if (i > 5 && i % 15 === 0) item = "coin";
-        else if (i > 5 && i % 45 === 0) item = "gas";
-
-        terrainPoints.push({ x: i * 40, y: currentY, item: item, itemCollected: false });
+        if (i > 100 && i < 300) curve = 2 * Math.sin(i * 0.05); // Mod (Curves)
+        if (i > 200 && i < 500) hill = 40 * Math.sin(i * 0.03); // Unche-neeche pahaad
+        if (i > 600 && i < 800) curve = -3 * Math.cos(i * 0.04);
+        
+        trackSegments.push({ curve: curve, hill: hill, coins: (i % 20 === 0) ? (Math.random() > 0.5 ? 1 : -1) : 0, coinCollected: false });
     }
 
     document.getElementById("currentScore").innerText = score;
@@ -35,143 +31,116 @@ function startRacingGame() {
     game = setInterval(drawRacing, currentSpeed);
 }
 
-// Terrain Ka Y nikalne ka helper function
-function getTerrainY(carX) {
-    for (let i = 0; i < terrainPoints.length - 1; i++) {
-        if (carX >= terrainPoints[i].x && carX <= terrainPoints[i+1].x) {
-            // Linear interpolation do points ke beech me smooth chalne ke liye
-            let t = (carX - terrainPoints[i].x) / (terrainPoints[i+1].x - terrainPoints[i].x);
-            return terrainPoints[i].y + t * (terrainPoints[i+1].y - terrainPoints[i].y);
-        }
-    }
-    return 300;
-}
-
 function drawRacing() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Camera follow mechanics (Gaadi ke sath screen scroll hogi)
-    let offsetX = carPhysics.x - 80;
-
-    // 1. DRAW SKY & HILLS BACKGROUND
-    ctx.fillStyle = "#1a0b2e"; ctx.fillRect(0, 0, canvas.width, canvas.height); // Dark Sci-fi Sky
-
-    // 2. DRAW MOUNTAIN TERRAIN (PAHAAD)
-    ctx.fillStyle = "#00f2fe";
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height);
     
-    for (let i = 0; i < terrainPoints.length; i++) {
-        let screenX = terrainPoints[i].x - offsetX;
-        if (screenX >= -40 && screenX <= canvas.width + 40) {
-            ctx.lineTo(screenX, terrainPoints[i].y);
-            
-            // Draw Items on Hills
-            if (terrainPoints[i].item !== "none" && !terrainPoints[i].itemCollected) {
-                ctx.font = "14px Arial";
-                let icon = terrainPoints[i].item === "coin" ? "💰" : "⛽";
-                ctx.fillText(icon, screenX - 5, terrainPoints[i].y - 20);
+    // Move forward automatically
+    trackPosition += carSpeed;
+    score += Math.floor(carSpeed / 2);
+    document.getElementById("currentScore").innerText = Math.floor(score/10);
 
-                // Hitbox detection for coins/gas
-                if (Math.abs(carPhysics.x - terrainPoints[i].x) < 25) {
-                    if (terrainPoints[i].item === "coin") {
-                        coins += 10; score += 20;
-                        localStorage.setItem("snakeCoins", coins);
-                    } else {
-                        fuel = Math.min(100, fuel + 40); // Refuel tank
-                    }
-                    terrainPoints[i].itemCollected = true;
-                    document.getElementById("coinCount").innerText = coins;
-                    document.getElementById("currentScore").innerText = score;
-                }
+    let startSegment = Math.floor(trackPosition / 20) % trackSegments.length;
+    let percent = (trackPosition % 20) / 20;
+    
+    // 1. DRAW 3D SKY & HILL BACKGROUND
+    let currentHill = trackSegments[startSegment].hill;
+    ctx.fillStyle = "#0c051a"; ctx.fillRect(0, 0, canvas.width, canvas.height); // Sky
+    ctx.fillStyle = "#0a1c28"; ctx.fillRect(0, 160 + currentHill * 0.5, canvas.width, 240 - currentHill * 0.5); // Distant mountains
+
+    // 2. RENDER 3D PSEUDO ROAD LINES (Back to Front)
+    let maxProjectedSegments = 40; // Kitni door tak road dikhegi
+    let dx = 0;
+    let camH = 1000; // Camera height
+
+    for (let i = maxProjectedSegments; i > 0; i--) {
+        let segIndex = (startSegment + i) % trackSegments.length;
+        let seg = trackSegments[segIndex];
+        
+        // Perspective Math Calculations for 3D depth
+        let p1_scale = camH / (camH + (i - percent) * 20);
+        let p2_scale = camH / (camH + (i - 1 - percent) * 20);
+        
+        let y1 = 160 + currentHill * 0.5 + (240 - currentHill * 0.5) * (i - percent) / maxProjectedSegments;
+        let y2 = 160 + currentHill * 0.5 + (240 - currentHill * 0.5) * (i - 1 - percent) / maxProjectedSegments;
+        
+        // Curve accumulating
+        dx += seg.curve * 3;
+        
+        let w1 = canvas.width * 0.7 * p1_scale;
+        let w2 = canvas.width * 0.7 * p2_scale;
+        let x1 = canvas.width / 2 + dx;
+        let x2 = canvas.width / 2 + dx + trackSegments[(startSegment+i-1)%trackSegments.length].curve*3;
+
+        // Striped Grass Effect (Rumble Strip)
+        ctx.fillStyle = (segIndex % 4 < 2) ? "#0a2f1d" : "#0f4229";
+        ctx.fillRect(0, y2, canvas.width, y1 - y2);
+
+        // 3D Road polygon paint
+        ctx.fillStyle = (segIndex % 4 < 2) ? "#222" : "#2a2a2a";
+        ctx.beginPath();
+        ctx.moveTo(x1 - w1, y1); ctx.lineTo(x1 + w1, y1);
+        ctx.lineTo(x2 + w2, y2); ctx.lineTo(x2 - w2, y2);
+        ctx.fill();
+
+        // 3D White lines on Road edges
+        ctx.fillStyle = (segIndex % 4 < 2) ? "#fff" : "#ff0055";
+        ctx.fillRect(x1 - w1 - 3, y1, 6, y2 - y1);
+        ctx.fillRect(x1 + w1 - 3, y1, 6, y2 - y1);
+
+        // Render 3D Floating Coins on Road
+        if (seg.coins !== 0 && !seg.coinCollected && i === 12) {
+            let coinScreenX = x1 + (seg.coins * w1 * 0.5);
+            ctx.font = `${Math.floor(20 * p1_scale) + 12}px Arial`;
+            ctx.fillText("💰", coinScreenX, y1 - 10);
+
+            // Hitbox checks for player taking the coins
+            if (Math.abs(playerX - (seg.coins * 0.7)) < 0.4) {
+                coins += 15;
+                localStorage.setItem("snakeCoins", coins);
+                seg.coinCollected = true;
+                document.getElementById("coinCount").innerText = coins;
             }
         }
     }
-    ctx.lineTo(canvas.width, canvas.height);
-    ctx.closePath();
-    ctx.fillStyle = "rgba(0, 242, 254, 0.25)"; ctx.fill(); // Glow neon hill fill
-    ctx.strokeStyle = "#00f2fe"; ctx.lineWidth = 3; ctx.stroke(); // Surface line
 
-    // 3. APPLIED 2D PHYSICS (GRAVITY & ACCELERATION)
-    let groundY = getTerrainY(carPhysics.x) - 15; // Offset to keep car on top
-    
-    // Reduce fuel over time
-    fuel -= 0.15;
-    if (fuel <= 0) {
-        clearInterval(game); gameStarted = false;
-        alert("⛽ FUEL EMPTY! Game Over. Score: " + score); location.reload();
-    }
+    // 3. RENDER PLAYER CYBER CAR (Fixed in Foreground)
+    let playerScreenX = canvas.width / 2 + (playerX * canvas.width * 0.35);
+    let carY = 340;
 
-    // Gravity Logic
-    if (carPhysics.y < groundY) {
-        carPhysics.vy += 0.5; // Hawa me hai toh neeche kheecho
-        carPhysics.angle += carPhysics.vAngle; // Apply rotation torque
-    } else {
-        carPhysics.y = groundY;
-        carPhysics.vy = 0;
-        // Zameen par aate hi angle hill ke slope jaisa ho jaye
-        let nextGroundY = getTerrainY(carPhysics.x + 5);
-        carPhysics.angle = Math.atan2(nextGroundY - groundY, 5);
-        carPhysics.vAngle *= 0.5; // Dampen air spin
-    }
-
-    // Move forward continuously
-    carPhysics.x += carPhysics.vx;
-    carPhysics.y += carPhysics.vy;
-    score++; document.getElementById("currentScore").innerText = Math.floor(score/10);
-
-    // 4. RENDER HILL CLIMB CAR WITH ROTATION
     ctx.save();
-    // Translate origin to car center for rotation
-    ctx.translate(carPhysics.x - offsetX, carPhysics.y);
-    ctx.rotate(carPhysics.angle);
+    // Acceleration tilt shake effect
+    let shake = (Math.random() - 0.5) * (carSpeed * 0.1);
+    ctx.translate(playerScreenX + shake, carY);
 
-    // Car Body Frame
-    ctx.fillStyle = "#ff0055";
-    ctx.fillRect(-20, -12, 40, 14); // Chassis
-    ctx.fillStyle = "#00f2fe";
-    ctx.fillRect(-8, -22, 18, 10); // Driver Cabin
-
-    // Wheels (Pahiyye)
-    ctx.fillStyle = "#fff";
-    ctx.beginPath(); ctx.arc(-12, 4, 6, 0, 2*Math.PI); ctx.fill(); // Rear wheel
-    ctx.beginPath(); ctx.arc(12, 4, 6, 0, 2*Math.PI); ctx.fill();  // Front wheel
+    // Sports Car Body
+    ctx.fillStyle = "#ff0055"; ctx.fillRect(-25, -5, 50, 18); // Main block
+    ctx.fillStyle = "#00f2fe"; ctx.fillRect(-18, -15, 36, 11); // Cabin windshield
+    ctx.fillStyle = "#fff"; ctx.fillRect(-22, 10, 8, 4); ctx.fillRect(14, 10, 8, 4); // Rear Lights
+    
+    // Wheels 3D angle view
+    ctx.fillStyle = "#111";
+    ctx.fillRect(-28, 2, 6, 12); ctx.fillRect(22, 2, 6, 12); 
     ctx.restore();
 
-    // 5. DRAW FUEL BAR OVERLAY ON CANVAS
-    ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fillRect(10, 10, 120, 15);
-    ctx.fillStyle = fuel > 30 ? "#00ff87" : "#ff0055";
-    ctx.fillRect(12, 12, fuel * 1.16, 11);
-    ctx.fillStyle = "#fff"; ctx.font = "10px Arial"; ctx.fillText("⛽ FUEL", 15, 21);
-
-    // CRASH CHECK: Agar gaadi poori ulti ho gayi (Head crash)
-    let normalizedAngle = Math.abs(carPhysics.angle % (2 * Math.PI));
-    if (carPhysics.y >= groundY && (normalizedAngle > 1.8 && normalizedAngle < 4.5)) {
-        clearInterval(game); gameStarted = false;
-        alert("💥 HEAD CRASHED! Gaadi ulti ho gayi. Score: " + Math.floor(score/10));
-        if (score > racingHighScore) localStorage.setItem("racingHighScore", Math.floor(score/10));
-        location.reload();
+    // Auto Center correction to stay on road safely
+    if (playerX > 1.2 || playerX < -1.2) {
+        carSpeed = Math.max(2, carSpeed - 0.5); // Grass slows you down
+    } else if (carSpeed < maxSpeed) {
+        carSpeed += 0.05; // Auto accelerate
     }
 }
 
-// KEY CONTROLS OVERRIDE FOR AIR FLIPS & SPEED
+// KEYBOARD EVENTS OVERLAY
 document.addEventListener("keydown", e => {
     if (!gameStarted || isPaused || activeGame !== "racing") return;
-    if (e.keyCode == 38 || e.keyCode == 39) { // Up or Right arrow to boost speed
-        carPhysics.vx = 4.5;
-    }
-    if (e.keyCode == 37) { // Left arrow: Anti-clockwise flip in air
-        carPhysics.vAngle = -0.07;
-    }
-});
-document.addEventListener("keyup", e => {
-    if (activeGame === "racing") carPhysics.vx = 2.5; // Reset to normal cruise speed
+    if (e.keyCode == 37) playerX -= 0.12; // Steer Left
+    if (e.keyCode == 39) playerX += 0.12; // Steer Right
 });
 
-// Mobile Controls handling mapping
+// MOBILE BUTTON HANDLING OVERLAY
 function handleControl(dir) {
     if (!gameStarted || isPaused || activeGame !== "racing") return;
-    if (dir === "UP") { carPhysics.vx = 4.5; setTimeout(() => { carPhysics.vx = 2.5; }, 400); }
-    if (dir === "LEFT") carPhysics.vAngle = -0.08;
-    if (dir === "RIGHT") carPhysics.vAngle = 0.08;
+    if (dir === "LEFT") playerX -= 0.18;
+    if (dir === "RIGHT") playerX += 0.18;
+    if (dir === "UP") { if(carSpeed < maxSpeed) carSpeed += 3; } // Nitro burst
 }
