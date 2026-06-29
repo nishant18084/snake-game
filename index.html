@@ -11,8 +11,8 @@
         <h1 id="mainTitle">Arcade Hub</h1>
         
         <div class="score-board">
-            <div id="scoreDiv">Score: <span id="currentScore">0</span></div>
-            <div id="bestDiv">Best: <span id="highScore">0</span></div>
+            <div>Score: <span id="currentScore">0</span></div>
+            <div>Best: <span id="highScore">0</span></div>
             <div>💰 Coins: <span id="coinCount">0</span></div>
         </div>
         
@@ -49,10 +49,11 @@
         <div id="gameArea" class="hidden">
             <div class="pause-container">
                 <button id="pauseBtn" class="pause-btn" onclick="togglePause()">⏸️ Pause</button>
+                <button class="pause-btn" style="background:#ff0055" onclick="location.reload()">🛑 Quit</button>
             </div>
 
             <div style="position: relative; display: inline-block;">
-                <canvas id="gameCanvas" width="400" height="400"></canvas>
+                <canvas id="gameCanvas" width="360" height="360"></canvas>
                 <div id="pauseOverlay" class="pause-overlay hidden">GAME PAUSED</div>
             </div>
             
