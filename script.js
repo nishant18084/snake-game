@@ -1,31 +1,160 @@
-// ==========================================
-// ENGINE 2: 3D HORIZON HILL RACING MODE (NO FUEL)
-// ==========================================
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const box = 18; // Canvas responsiveness tweak
+
+// Multi-Game Core State
+let activeGame = "none"; 
+let game, currentSpeed, gameStarted = false, isPaused = false;
+let score = 0;
+
+// Universal Memory
+let coins = parseInt(localStorage.getItem("snakeCoins")) || 0;
+let snakeHighScore = parseInt(localStorage.getItem("snakeHighScore")) || 0;
+let racingHighScore = parseInt(localStorage.getItem("racingHighScore")) || 0;
+document.getElementById("coinCount").innerText = coins;
+
+// Snake Engine Configurations
+let snake, food, d;
+let unlockedSkins = JSON.parse(localStorage.getItem("unlockedSkins")) || ["cyan"];
+let currentSkin = localStorage.getItem("currentSkin") || "cyan";
+const skinsCollection = {
+    cyan: { name: "Neon Cyan", head: "#00f2fe", body: "#0072ff" },
+    green: { name: "Toxic Green", head: "#00ff87", body: "#00a352" },
+    purple: { name: "Cosmic Purple", head: "#e040fb", body: "#7b1fa2" }
+};
+
+// 3D Racing Engine Configurations
 let trackPosition = 0;
-let playerX = 0; // -1 se 1 tak (road ke left/right)
+let playerX = 0; 
 let carSpeed = 0;
-const maxSpeed = 20;
-
-// 3D Track generation (pahaad aur curves)
+const maxSpeed = 18;
 let trackSegments = [];
-function startRacingGame() {
-    score = 0; isPaused = false; trackPosition = 0; playerX = 0; carSpeed = 5;
-    trackSegments = [];
-    
-    // 1000 segments lambi 3D road banayein pahaad aur mod ke sath
-    for (let i = 0; i < 1000; i++) {
-        let curve = 0;
-        let hill = 0;
-        
-        if (i > 100 && i < 300) curve = 2 * Math.sin(i * 0.05); // Mod (Curves)
-        if (i > 200 && i < 500) hill = 40 * Math.sin(i * 0.03); // Unche-neeche pahaad
-        if (i > 600 && i < 800) curve = -3 * Math.cos(i * 0.04);
-        
-        trackSegments.push({ curve: curve, hill: hill, coins: (i % 20 === 0) ? (Math.random() > 0.5 ? 1 : -1) : 0, coinCollected: false });
-    }
 
+// SCREEN NAVIGATION FUNCTIONS (Yahan block break ho raha tha)
+function selectGame(gameName) {
+    activeGame = gameName;
+    document.getElementById("hubMenu").classList.add("hidden"); // Hub Chupao
+    
+    if (gameName === 'snake') {
+        document.getElementById("mainTitle").innerText = "Snake Neon Pro";
+        document.getElementById("highScore").innerText = snakeHighScore;
+        showSnakeMenu();
+    } else if (gameName === 'racing') {
+        document.getElementById("mainTitle").innerText = "3D Turbo Racing";
+        document.getElementById("highScore").innerText = racingHighScore;
+        currentSpeed = 35; // 3D Frame Refresh Loop Speed
+        startRacingGame();
+    }
+}
+
+function backToHub() {
+    activeGame = "none";
+    document.getElementById("startMenu").classList.add("hidden");
+    document.getElementById("gameArea").classList.add("hidden");
+    document.getElementById("hubMenu").classList.remove("hidden");
+    document.getElementById("mainTitle").innerText = "Arcade Hub";
+}
+
+function showSnakeMenu() {
+    document.getElementById("modeMenu").classList.add("hidden");
+    document.getElementById("shopMenu").classList.add("hidden");
+    document.getElementById("gameArea").classList.add("hidden");
+    document.getElementById("startMenu").classList.remove("hidden");
+}
+
+function showModes() { 
+    document.getElementById("startMenu").classList.add("hidden"); 
+    document.getElementById("modeMenu").classList.remove("hidden"); 
+}
+
+function showShop() { 
+    document.getElementById("startMenu").classList.add("hidden"); 
+    document.getElementById("shopMenu").classList.remove("hidden"); 
+    buildShopMenu(); 
+}
+
+function hideShop() { showSnakeMenu(); }
+
+function buildShopMenu() {
+    const container = document.getElementById("shopItemsContainer"); container.innerHTML = "";
+    Object.keys(skinsCollection).forEach(id => {
+        const item = skinsCollection[id]; const isUnlocked = unlockedSkins.includes(id); const isEquipped = currentSkin === id;
+        container.insertAdjacentHTML('beforeend', `
+            <div class="shop-item">
+                <div><b>${item.name}</b></div>
+                <button class="buy-btn" onclick="handleShopClick('${id}')">${isEquipped?'Equipped':isUnlocked?'Select':'Free'}</button>
+            </div>`);
+    });
+}
+
+function handleShopClick(id) {
+    currentSkin = id; localStorage.setItem("currentSkin", id); buildShopMenu();
+}
+
+function togglePause() {
+    if (!gameStarted) return;
+    const overlay = document.getElementById("pauseOverlay");
+    const btn = document.getElementById("pauseBtn");
+    if (!isPaused) {
+        isPaused = true; clearInterval(game); overlay.classList.remove("hidden"); btn.innerText = "▶️ Resume";
+    } else {
+        isPaused = false; overlay.classList.add("hidden"); btn.innerText = "⏸️ Pause";
+        game = setInterval(activeGame === "snake" ? drawSnake : drawRacing, currentSpeed);
+    }
+}
+
+// ------------------------------------------
+// CORE 1: SNAKE GAMEPLAY
+// ------------------------------------------
+function startGame(speed) {
+    currentSpeed = speed; score = 0; d = undefined; isPaused = false;
+    snake = [{ x: 9 * box, y: 10 * box }];
+    food = { x: Math.floor(Math.random() * 19) * box, y: Math.floor(Math.random() * 19) * box };
     document.getElementById("currentScore").innerText = score;
-    document.getElementById("hubMenu").classList.add("hidden");
+    document.getElementById("modeMenu").classList.add("hidden");
+    document.getElementById("gameArea").classList.remove("hidden");
+    gameStarted = true;
+    game = setInterval(drawSnake, currentSpeed);
+}
+
+function drawSnake() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let skin = skinsCollection[currentSkin] || skinsCollection["cyan"];
+    for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = (i === 0) ? skin.head : skin.body;
+        ctx.fillRect(snake[i].x, snake[i].y, box-1, box-1);
+    }
+    ctx.font = "16px Arial"; ctx.fillText("🍎", food.x, food.y + 14);
+
+    let snakeX = snake[0].x, snakeY = snake[0].y;
+    if (d == "LEFT") snakeX -= box; if (d == "UP") snakeY -= box; if (d == "RIGHT") snakeX += box; if (d == "DOWN") snakeY += box;
+
+    if (snakeX == food.x && snakeY == food.y) {
+        score++; coins += 2; document.getElementById("currentScore").innerText = score;
+        document.getElementById("coinCount").innerText = coins; localStorage.setItem("snakeCoins", coins);
+        if(score > snakeHighScore) { snakeHighScore = score; localStorage.setItem("snakeHighScore", snakeHighScore); }
+        food = { x: Math.floor(Math.random() * 19) * box, y: Math.floor(Math.random() * 19) * box };
+    } else { snake.pop(); }
+
+    let newHead = { x: snakeX, y: snakeY };
+    if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
+        clearInterval(game); gameStarted = false; alert("💥 GAME OVER! Score: " + score); backToHub();
+    }
+    snake.unshift(newHead);
+}
+function collision(head, array) { for (let i = 0; i < array.length; i++) if (head.x == array[i].x && head.y == array[i].y) return true; return false; }
+
+// ------------------------------------------
+// CORE 2: 3D HORIZON RACING GAMEPLAY
+// ------------------------------------------
+function startRacingGame() {
+    score = 0; isPaused = false; trackPosition = 0; playerX = 0; carSpeed = 5; trackSegments = [];
+    for (let i = 0; i < 600; i++) {
+        let curve = (i > 80 && i < 220) ? 2.5 * Math.sin(i * 0.05) : (i > 350 && i < 500) ? -3 * Math.cos(i * 0.04) : 0;
+        let hill = (i > 150 && i < 400) ? 35 * Math.sin(i * 0.03) : 0;
+        trackSegments.push({ curve: curve, hill: hill, coinX: (i % 25 === 0) ? (Math.random() > 0.5 ? 0.5 : -0.5) : 0, collected: false });
+    }
+    document.getElementById("currentScore").innerText = score;
     document.getElementById("gameArea").classList.remove("hidden");
     gameStarted = true;
     game = setInterval(drawRacing, currentSpeed);
@@ -33,114 +162,89 @@ function startRacingGame() {
 
 function drawRacing() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Move forward automatically
-    trackPosition += carSpeed;
-    score += Math.floor(carSpeed / 2);
+    trackPosition += carSpeed; score++;
     document.getElementById("currentScore").innerText = Math.floor(score/10);
 
     let startSegment = Math.floor(trackPosition / 20) % trackSegments.length;
     let percent = (trackPosition % 20) / 20;
-    
-    // 1. DRAW 3D SKY & HILL BACKGROUND
     let currentHill = trackSegments[startSegment].hill;
-    ctx.fillStyle = "#0c051a"; ctx.fillRect(0, 0, canvas.width, canvas.height); // Sky
-    ctx.fillStyle = "#0a1c28"; ctx.fillRect(0, 160 + currentHill * 0.5, canvas.width, 240 - currentHill * 0.5); // Distant mountains
 
-    // 2. RENDER 3D PSEUDO ROAD LINES (Back to Front)
-    let maxProjectedSegments = 40; // Kitni door tak road dikhegi
+    // Draw Sky & Horizon Background
+    ctx.fillStyle = "#0c051a"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#0a1c28"; ctx.fillRect(0, 140 + currentHill*0.5, canvas.width, 220 - currentHill*0.5);
+
     let dx = 0;
-    let camH = 1000; // Camera height
-
-    for (let i = maxProjectedSegments; i > 0; i--) {
-        let segIndex = (startSegment + i) % trackSegments.length;
-        let seg = trackSegments[segIndex];
+    for (let i = 30; i > 0; i--) {
+        let idx = (startSegment + i) % trackSegments.length;
+        let seg = trackSegments[idx];
         
-        // Perspective Math Calculations for 3D depth
-        let p1_scale = camH / (camH + (i - percent) * 20);
-        let p2_scale = camH / (camH + (i - 1 - percent) * 20);
+        let p1 = 800 / (800 + (i - percent) * 20);
+        let p2 = 800 / (800 + (i - 1 - percent) * 20);
         
-        let y1 = 160 + currentHill * 0.5 + (240 - currentHill * 0.5) * (i - percent) / maxProjectedSegments;
-        let y2 = 160 + currentHill * 0.5 + (240 - currentHill * 0.5) * (i - 1 - percent) / maxProjectedSegments;
+        let y1 = 140 + currentHill*0.5 + (220 - currentHill*0.5) * (i - percent) / 30;
+        let y2 = 140 + currentHill*0.5 + (220 - currentHill*0.5) * (i - 1 - percent) / 30;
         
-        // Curve accumulating
-        dx += seg.curve * 3;
-        
-        let w1 = canvas.width * 0.7 * p1_scale;
-        let w2 = canvas.width * 0.7 * p2_scale;
-        let x1 = canvas.width / 2 + dx;
-        let x2 = canvas.width / 2 + dx + trackSegments[(startSegment+i-1)%trackSegments.length].curve*3;
+        dx += seg.curve * 2.5;
+        let w1 = canvas.width * 0.65 * p1, w2 = canvas.width * 0.65 * p2;
+        let x1 = canvas.width / 2 + dx, x2 = canvas.width / 2 + dx + trackSegments[(startSegment+i-1)%trackSegments.length].curve*2.5;
 
-        // Striped Grass Effect (Rumble Strip)
-        ctx.fillStyle = (segIndex % 4 < 2) ? "#0a2f1d" : "#0f4229";
-        ctx.fillRect(0, y2, canvas.width, y1 - y2);
+        // Rumble Grass Side Strip
+        ctx.fillStyle = (idx % 4 < 2) ? "#0a2f1d" : "#0f4229"; ctx.fillRect(0, y2, canvas.width, y1 - y2);
+        // Asphalt 3D Road
+        ctx.fillStyle = (idx % 4 < 2) ? "#222" : "#2d2d2d";
+        ctx.beginPath(); ctx.moveTo(x1-w1, y1); ctx.lineTo(x1+w1, y1); ctx.lineTo(x2+w2, y2); ctx.lineTo(x2-w2, y2); ctx.fill();
+        // Borders
+        ctx.fillStyle = (idx % 4 < 2) ? "#fff" : "#ff0055";
+        ctx.fillRect(x1-w1-2, y1, 4, y2-y1); ctx.fillRect(x1+w1-2, y1, 4, y2-y1);
 
-        // 3D Road polygon paint
-        ctx.fillStyle = (segIndex % 4 < 2) ? "#222" : "#2a2a2a";
-        ctx.beginPath();
-        ctx.moveTo(x1 - w1, y1); ctx.lineTo(x1 + w1, y1);
-        ctx.lineTo(x2 + w2, y2); ctx.lineTo(x2 - w2, y2);
-        ctx.fill();
-
-        // 3D White lines on Road edges
-        ctx.fillStyle = (segIndex % 4 < 2) ? "#fff" : "#ff0055";
-        ctx.fillRect(x1 - w1 - 3, y1, 6, y2 - y1);
-        ctx.fillRect(x1 + w1 - 3, y1, 6, y2 - y1);
-
-        // Render 3D Floating Coins on Road
-        if (seg.coins !== 0 && !seg.coinCollected && i === 12) {
-            let coinScreenX = x1 + (seg.coins * w1 * 0.5);
-            ctx.font = `${Math.floor(20 * p1_scale) + 12}px Arial`;
-            ctx.fillText("💰", coinScreenX, y1 - 10);
-
-            // Hitbox checks for player taking the coins
-            if (Math.abs(playerX - (seg.coins * 0.7)) < 0.4) {
-                coins += 15;
-                localStorage.setItem("snakeCoins", coins);
-                seg.coinCollected = true;
-                document.getElementById("coinCount").innerText = coins;
+        // Render Coins in 3D Space
+        if (seg.coinX !== 0 && !seg.collected && i === 10) {
+            let cx = x1 + (seg.coinX * w1);
+            ctx.font = "16px Arial"; ctx.fillText("💰", cx - 8, y1 - 5);
+            if (Math.abs(playerX - seg.coinX) < 0.35) {
+                coins += 5; localStorage.setItem("snakeCoins", coins);
+                document.getElementById("coinCount").innerText = coins; seg.collected = true;
             }
         }
     }
 
-    // 3. RENDER PLAYER CYBER CAR (Fixed in Foreground)
-    let playerScreenX = canvas.width / 2 + (playerX * canvas.width * 0.35);
-    let carY = 340;
-
-    ctx.save();
-    // Acceleration tilt shake effect
-    let shake = (Math.random() - 0.5) * (carSpeed * 0.1);
-    ctx.translate(playerScreenX + shake, carY);
-
-    // Sports Car Body
-    ctx.fillStyle = "#ff0055"; ctx.fillRect(-25, -5, 50, 18); // Main block
-    ctx.fillStyle = "#00f2fe"; ctx.fillRect(-18, -15, 36, 11); // Cabin windshield
-    ctx.fillStyle = "#fff"; ctx.fillRect(-22, 10, 8, 4); ctx.fillRect(14, 10, 8, 4); // Rear Lights
-    
-    // Wheels 3D angle view
-    ctx.fillStyle = "#111";
-    ctx.fillRect(-28, 2, 6, 12); ctx.fillRect(22, 2, 6, 12); 
+    // Render Foreground Player Supercar
+    let pCarX = canvas.width / 2 + (playerX * canvas.width * 0.32);
+    ctx.save(); ctx.translate(pCarX, 310);
+    ctx.fillStyle = "#ff0055"; ctx.fillRect(-22, -4, 44, 15); // Chassis
+    ctx.fillStyle = "#00f2fe"; ctx.fillRect(-15, -12, 30, 9); // Shield
+    ctx.fillStyle = "#111"; ctx.fillRect(-25, 2, 5, 10); ctx.fillRect(20, 2, 5, 10); // Tires
     ctx.restore();
 
-    // Auto Center correction to stay on road safely
-    if (playerX > 1.2 || playerX < -1.2) {
-        carSpeed = Math.max(2, carSpeed - 0.5); // Grass slows you down
-    } else if (carSpeed < maxSpeed) {
-        carSpeed += 0.05; // Auto accelerate
-    }
+    // Physics Speed logic
+    if (playerX > 1.1 || playerX < -1.1) { carSpeed = Math.max(2, carSpeed - 0.4); } // Off-road slow down
+    else if (carSpeed < maxSpeed) { carSpeed += 0.04; }
 }
 
-// KEYBOARD EVENTS OVERLAY
+// SHARED CONTROLS HUB
 document.addEventListener("keydown", e => {
-    if (!gameStarted || isPaused || activeGame !== "racing") return;
-    if (e.keyCode == 37) playerX -= 0.12; // Steer Left
-    if (e.keyCode == 39) playerX += 0.12; // Steer Right
+    if (!gameStarted || isPaused) return;
+    if (activeGame === "snake") {
+        if (e.keyCode == 37 && d != "RIGHT") d = "LEFT";
+        else if (e.keyCode == 38 && d != "DOWN") d = "UP";
+        else if (e.keyCode == 39 && d != "LEFT") d = "RIGHT";
+        else if (e.keyCode == 40 && d != "UP") d = "DOWN";
+    } else if (activeGame === "racing") {
+        if (e.keyCode == 37) playerX -= 0.15;
+        if (e.keyCode == 39) playerX += 0.15;
+    }
 });
 
-// MOBILE BUTTON HANDLING OVERLAY
 function handleControl(dir) {
-    if (!gameStarted || isPaused || activeGame !== "racing") return;
-    if (dir === "LEFT") playerX -= 0.18;
-    if (dir === "RIGHT") playerX += 0.18;
-    if (dir === "UP") { if(carSpeed < maxSpeed) carSpeed += 3; } // Nitro burst
-}
+    if (!gameStarted || isPaused) return;
+    if (activeGame === "snake") {
+        if (dir == "LEFT" && d != "RIGHT") d = "LEFT";
+        if (dir == "UP" && d != "DOWN") d = "UP";
+        if (dir == "RIGHT" && d != "LEFT") d = "RIGHT";
+        if (dir == "DOWN" && d != "UP") d = "DOWN";
+    } else if (activeGame === "racing") {
+        if (dir == "LEFT") playerX -= 0.25;
+        if (dir == "RIGHT") playerX += 0.25;
+        if (dir == "UP" && carSpeed < maxSpeed) carSpeed += 1.5;
+    }
+            }
